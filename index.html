@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K.S | King of Study</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background: radial-gradient(circle at top, #1b1136, #06040d); color: #fdf8ee; display: flex; justify-content: center; }
+    .app { width: 100%; max-width: 420px; height: 96vh; background: linear-gradient(165deg, #120c24, #090612); border: 2px solid #f59e0b; border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; margin-top: 10px; box-shadow: 0 0 38px rgba(245, 158, 11, 0.28); }
+    .top { background: #07050f; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(245, 158, 11, 0.35); }
+    .view { flex: 1; padding: 15px; overflow-y: auto; display: none; flex-direction: column; }
+    .view.active { display: flex; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    .tile { background: linear-gradient(145deg, #1d1536, #110b22); border: 1px solid rgba(251, 191, 36, 0.4); padding: 18px 10px; border-radius: 16px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 6px 15px rgba(0,0,0,0.45); }
+    .tile:hover { border-color: #ffd700; transform: translateY(-3px); box-shadow: 0 0 18px rgba(255, 215, 0, 0.35); }
+    .tile span { font-size: 30px; display: block; margin-bottom: 6px; }
+    input, button { width: 100%; padding: 11px; border-radius: 10px; border: none; margin-top: 8px; font-size: 14px; }
+    input { background: #080512; color: #fff; border: 1px solid rgba(245, 158, 11, 0.55); }
+    button { background: linear-gradient(90deg, #d97706, #fbbf24); color: #090612; font-weight: bold; cursor: pointer; }
+    .card { background: #19122e; border: 1px solid rgba(245, 158, 11, 0.25); padding: 12px; border-radius: 12px; margin-top: 10px; font-size: 13.5px; line-height: 1.5; }
+    code { color: #ffd700; font-weight: bold; }
+    img.ai-pic { width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid #ffd700; display: none; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top">
+      <button id="back" style="width:68px;margin:0;padding:6px;display:none;" onclick="go('home')">◀ Home</button>
+      <b id="ttl" style="color:#ffd700;letter-spacing:0.8px;">K.S | KING OF STUDY</b>
+      <span style="font-size:11px;color:#fbbf24;">ROYAL</span>
+    </div>
+
+    <div class="view active" id="home">
+      <h3 style="color:#ffd700;">Welcome, Shyam</h3>
+      <p style="font-size:12.5px;color:#cbd5e1;">K.S | King of Study — AI & Exam Suite</p>
+      <div class="grid">
+        <div class="tile" onclick="go('img','AI Image Lab')"><span>🎨</span><b>AI Image Lab</b></div>
+        <div class="tile" onclick="go('tutor','AI Study Tutor')"><span>🧠</span><b>AI Tutor</b></div>
+        <div class="tile" onclick="go('quiz','AI Quiz Maker')"><span>⚡</span><b>AI Quiz Gen</b></div>
+        <div class="tile" onclick="go('timer','Exam Timer')"><span>⏱️</span><b>Exam Timer</b></div>
+        <div class="tile" onclick="go('vault','Formula Vault')"><span>📐</span><b>Formulas</b></div>
+        <div class="tile" onclick="go('notes','Study Notes')"><span>📝</span><b>Quick Notes</b></div>
+      </div>
+    </div>
+
+    <div class="view" id="img">
+      <input id="imgPrompt" placeholder="Describe diagram or art (e.g. 3D glowing DNA)..." />
+      <button onclick="genImage()">✨ Generate AI Visual</button>
+      <div id="imgStatus" class="card" style="display:none;">⏳ Creating your visual...</div>
+      <img id="aiImg" class="ai-pic" />
+    </div>
+
+    <div class="view" id="tutor">
+      <div id="tutorOut" class="card" style="flex:1;overflow-y:auto;">🧠 Ask any question in Biology, Physics, Chemistry, Python, or C++!</div>
+      <input id="tutorIn" placeholder="Ask K.S AI Tutor..." onkeydown="if(event.key==='Enter')askTutor()" />
+      <button onclick="askTutor()">Ask & Speak Answer</button>
+    </div>
+
+    <div class="view" id="quiz">
+      <input id="quizTopic" placeholder="Enter topic (e.g. Photosynthesis, C++ Loops)..." />
+      <button onclick="makeAIQuiz()">⚡ Generate 3-Question Quiz</button>
+      <div id="quizArea"></div>
+    </div>
+
+    <div class="view" id="timer">
+      <div class="card" style="text-align:center;">
+        <p style="color:#ffd700;font-size:12px;">POMODORO FOCUS TIMER</p>
+        <h1 id="clockDisplay" style="font-size:42px;margin:10px 0;color:#fff;">25:00</h1>
+        <div style="display:flex;gap:8px;">
+          <button onclick="startTimer()">▶ Start</button>
+          <button onclick="resetTimer()" style="background:#334155;color:#fff;">↺ Reset</button>
+        </div>
+      </div>
+      <div class="card">
+        <b style="color:#ffd700;">Exam Percentage Calculator</b>
+        <input id="mGot" type="number" placeholder="Marks Obtained (e.g. 475)" />
+        <input id="mTot" type="number" placeholder="Total Marks (e.g. 500)" />
+        <button onclick="calcPct()">Calculate %</button>
+        <p id="pctOut" style="margin-top:8px;color:#ffd700;font-weight:bold;"></p>
+      </div>
+    </div>
+
+    <div class="view" id="vault">
+      <div class="card">
+        <b style="color:#ffd700;">➕ Add & Save Your Own Formula</b>
+        <input id="fName" placeholder="Subject / Name (e.g. Physics - Velocity)" />
+        <input id="fExpr" placeholder="Formula (e.g. v = u + at)" />
+        <button onclick="saveFormula()">💾 Save Custom Formula</button>
+      </div>
+      <div id="customFormulas"></div>
+      <div class="card"><b>⚡ Physics:</b> Ohm's Law: <code>V = I × R</code> | Force: <code>F = m × a</code> | Kinetic Energy: <code>KE = ½mv²</code></div>
+      <div class="card"><b>🧪 Chemistry:</b> pH = <code>-log[H⁺]</code> | Ideal Gas: <code>PV = nRT</code> | Molarity: <code>M = moles / Liters</code></div>
+      <div class="card"><b>📐 Math:</b> Quadratic: <code>x = (-b ± √(b²-4ac)) / 2a</code> | Circle Area: <code>πr²</code></div>
+    </div>
+
+    <div class="view" id="notes">
+      <input id="noteTitle" placeholder="Note Title (e.g. Biology Ch. 4)..." />
+      <input id="noteBody" placeholder="Write key point..." />
+      <button onclick="saveNote()">💾 Save Study Note</button>
+      <div id="noteList"></div>
+    </div>
+  </div>
+
+  <script>
+    function go(id, t = "K.S | KING OF STUDY") {
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+      document.getElementById("ttl").textContent = t;
+      document.getElementById("back").style.display = id === "home" ? "none" : "block";
+      if (id === "notes") renderNotes();
+      if (id === "vault") renderFormulas();
+    }
+
+    function genImage() {
+      const p = document.getElementById("imgPrompt").value.trim();
+      if (!p) return;
+      const st = document.getElementById("imgStatus"), img = document.getElementById("aiImg");
+      st.style.display = "block"; st.textContent = "⏳ Generating AI visual..."; img.style.display = "none";
+      img.onload = () => { st.style.display = "none"; img.style.display = "block"; };
+      img.src = "https://pollinations.ai" + encodeURIComponent(p) + "?width=512&height=512&nologo=true&seed=" + Math.floor(Math.random() * 9999);
+    }
+
+    async function askTutor() {
+      const q = document.getElementById("tutorIn").value.trim(), out = document.getElementById("tutorOut");
+      if (!q) return;
+      out.textContent = "⏳ K.S AI Tutor is thinking...";
+      try {
+        const res = await fetch("https://pollinations.ai" + encodeURIComponent("Explain clearly for a student: " + q));
+        const txt = await res.text();
+        out.textContent = "🧠 " + txt;
+        if ("speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance(txt.slice(0, 200)));
+      } catch { out.textContent = "⚠️ Check internet connection."; }
+    }
+
+    async function makeAIQuiz() {
+      const topic = document.getElementById("quizTopic").value.trim(), area = document.getElementById("quizArea");
+      if (!topic) return;
+      area.innerHTML = "<div class='card'>⚡ Generating quiz on <b>" + topic + "</b>...</div>";
+      try {
+        const prompt = `Create 3 short multiple choice questions about ${topic}. Return ONLY valid JSON array like [{"q":"Question?","o":["A","B","C"],"a":0}] with no markdown.`;
+        const res = await fetch("https://pollinations.ai" + encodeURIComponent(prompt));
+        const raw = await res.text();
+        const data = JSON.parse(raw.match(/\[[\s\S]*\]/));
+        area.innerHTML = data.map((item, qi) => `
+          <div class="card">
+            <b>Q${qi + 1}: ${item.q}</b>
+            ${item.o.map((opt, oi) => `<button style="margin-top:6px;background:#090612;color:#fff;border:1px solid #f59e0b;" onclick="this.style.background=${oi === item.a}?'#16a34a':'#dc2626'">${opt}</button>`).join("")}
+          </div>`).join("");
+      } catch { area.innerHTML = "<div class='card'>⚠️ Could not generate quiz. Try a simpler topic name!</div>"; }
+    }
+
+    let sec = 1500, tInt = null;
+    function startTimer() {
+      if (tInt) return;
+      tInt = setInterval(() => {
+        if (sec <= 0) { clearInterval(tInt); tInt = null; alert("Time's up! Take a 5-minute break."); return; }
+        sec--;
+        document.getElementById("clockDisplay").textContent = String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
+      }, 1000);
+    }
+    function resetTimer() { clearInterval(tInt); tInt = null; sec = 1500; document.getElementById("clockDisplay").textContent = "25:00"; }
+    function calcPct() {
+      const g = parseFloat(document.getElementById("mGot").value), t = parseFloat(document.getElementById("mTot").value);
+      if (g >= 0 && t > 0) document.getElementById("pctOut").textContent = "Score: " + ((g / t) * 100).toFixed(2) + "%";
+    }
+
+    function saveFormula() {
+      const name = document.getElementById("fName").value.trim(), expr = document.getElementById("fExpr").value.trim();
+      if (!name || !expr) return;
+      const list = JSON.parse(localStorage.getItem("ks_formulas") || "[]");
+      list.unshift({ name, expr });
+      localStorage.setItem("ks_formulas", JSON.stringify(list));
+      document.getElementById("fName").value = ""; document.getElementById("fExpr").value = "";
+      renderFormulas();
+    }
+    function delFormula(i) {
+      const list = JSON.parse(localStorage.getItem("ks_formulas") || "[]");
+      list.splice(i, 1);
+      localStorage.setItem("ks_formulas", JSON.stringify(list));
+      renderFormulas();
+    }
+    function renderFormulas() {
+      const list = JSON.parse(localStorage.getItem("ks_formulas") || "[]");
+      document.getElementById("customFormulas").innerHTML = list.map((f, i) => `
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+          <div><b>⭐ ${f.name}:</b> <code>${f.expr}</code></div>
+          <button onclick="delFormula(${i})" style="width:36px;margin:0;padding:4px;background:#dc2626;color:#fff;">✕</button>
+        </div>`).join("");
+    }
+
+    function saveNote() {
+      const title = document.getElementById("noteTitle").value.trim(), body = document.getElementById("noteBody").value.trim();
+      if (!title || !body) return;
+      const list = JSON.parse(localStorage.getItem("ks_notes") || "[]");
+      list.unshift({ title, body });
+      localStorage.setItem("ks_notes", JSON.stringify(list));
+      document.getElementById("noteTitle").value = ""; document.getElementById("noteBody").value = "";
+      renderNotes();
+    }
+    function renderNotes() {
+      const list = JSON.parse(localStorage.getItem("ks_notes") || "[]");
+      document.getElementById("noteList").innerHTML = list.map(n => `<div class="card"><b style="color:#ffd700;">${n.title}</b><p>${n.body}</p></div>`).join("");
+    }
+  </script>
+</body>
+</html>
